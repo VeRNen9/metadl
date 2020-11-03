@@ -1,0 +1,5 @@
+# MetaLearner parameters
+MyMetaLearner.img_size = 28
+MyMetaLearner.n_ways = 5
+MyMetaLearner.k_shots = 1
+MyMetaLearner.embedding_dim = 64
