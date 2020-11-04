@@ -5,7 +5,7 @@ import csv
 import tensorflow as tf
 
 from metadl.api.api import MetaLearner, Learner, Predictor
-from helper import f_embedding, cosine_distance, attention_mechanism
+from helper import embedding_architecture, cosine_distance, attention_mechanism
 
 
 # Line necessary for duranium. Comment it otherwise.
@@ -15,20 +15,33 @@ tf.random.set_seed(1234)
 @gin.configurable
 class MyMetaLearner(MetaLearner):
 
-    def __init__(self, img_size, n_way=5, k_shot=1,
+    def __init__(self, img_size, num_channels, n_way=5, k_shot=1,
                  embedding_dim=64, distance_func='cosine'):
         super().__init__()
         self.img_size = img_size
+        self.num_channels = num_channels
         self.n_way = n_way
         self.k_shot = k_shot
         self.embedding_dim = embedding_dim
         self.distance_func = self._set_distance_func(distance_func)
         
-        self.f = f_embedding(img_size, embedding_dim)
-        self.g = None
-        self.attention = attention_mechanism(f_embedding=f,
-                                             g_embedding=g,
-                                             distance_func=self.distance_func)
+        self.f = embedding_architecture(
+            img_size=img_size,
+            num_channels=num_channels,
+            embedding_dim=embedding_dim,
+            name='f_embedding')
+        
+        self.g = embedding_architecture(
+            img_size=img_size,
+            num_channels=num_channels,
+            embedding_dim=embedding_dim,
+            name='g_embedding')
+        
+        self.attention = attention_mechanism(
+            f_embedding=f,
+            g_embedding=g,
+            distance_func=self.distance_func)
+
         self.classifier = None
         
     def _set_distance_func(self, distance_func):
