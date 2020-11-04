@@ -5,15 +5,18 @@ import csv
 import tensorflow as tf
 
 from metadl.api.api import MetaLearner, Learner, Predictor
+from helper import f_embedding
 
+
+# Line necessary for duranium. Comment it otherwise.
+os.environ["CUDA_VISIBLE_DEVICES"] = "[1-7]"
 tf.random.set_seed(1234)
 
 @gin.configurable
 class MyMetaLearner(MetaLearner):
 
     def __init__(self, img_size, n_way=5, k_shot=1,
-                 embedding_dim=64,
-                 distance_func=tf.losses.cosine_distance):
+                 embedding_dim=64, distance_func=None):
         super().__init__()
         self.img_size = img_size
         self.n_way = n_way
@@ -21,7 +24,7 @@ class MyMetaLearner(MetaLearner):
         self.embedding_dim = embedding_dim
         self.distance_func = distance_func
         
-        self.f = None
+        self.f = f_embedding(img_size, embedding_dim)
         self.g = None
         self.attention = None
         self.classifier = None
