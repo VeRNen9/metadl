@@ -47,8 +47,8 @@ def embedding_architecture(img_size=28, num_channels=3,
         model.add(MaxPooling2D((2, 2)))
 
     model.add(Flatten())
-    model._name = name
-
+    if name:
+        model._name = name
     return model
 
 
