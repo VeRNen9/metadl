@@ -7,17 +7,23 @@ from tensorflow.keras.layers import Conv2D, BatchNormalization, \
 
 tf.random.set_seed(1234)
 
-def f_embedding(img_size=28, embedding_dim=64):
+
+def embedding_architecture(img_size=28, num_channels=3,
+                           embedding_dim=64, name=None):
     """
-    Implements embedding function for the query set.
+    Implements embedding function architecture.
     
     Parameters
     ----------
     img_size: int
         Size of the input image. Images expected to have
         the width and height equal.
+    num_channels: int
+        Number of channels in the input images.
     embedding_dim: int
         Dimension of the embedding for one image.
+    name: str
+        Name to be assigned to the model.
         
     Returns
     -------
@@ -26,30 +32,22 @@ def f_embedding(img_size=28, embedding_dim=64):
     """
     model = Sequential()
     
-    model.add(Conv2D(embedding_dim, (3, 3), padding='same',
-                     input_shape=(img_size, img_size, 3)))
-    model.add(BatchNormalization())
-    model.add(ReLU())
-    model.add(MaxPooling2D((2, 2)))
+    for layer in range(4):
+        conv_params = {
+            'filters': embedding_dim,
+            'kernel_size': (3, 3),
+            'padding': 'same'
+        }
+        if layer == 0:
+            conv_params['input_shape'] = (img_size, img_size, num_channels)
 
-    model.add(Conv2D(embedding_dim, (3, 3), padding='same'))
-    model.add(BatchNormalization())
-    model.add(ReLU())
-    model.add(MaxPooling2D((2, 2)))
+        model.add(Conv2D(**conv_params))
+        model.add(BatchNormalization())
+        model.add(ReLU())
+        model.add(MaxPooling2D((2, 2)))
 
-    model.add(Conv2D(embedding_dim, (3, 3), padding='same'))
-    model.add(BatchNormalization())
-    model.add(ReLU())
-    model.add(MaxPooling2D((2, 2)))
-    
-    model.add(Conv2D(embedding_dim, (3, 3), padding='same'))
-    model.add(BatchNormalization())
-    model.add(ReLU())
-    model.add(MaxPooling2D((2, 2)))
-    
     model.add(Flatten())
-    
-    model._name = 'F_embedding'
+    model._name = name
 
     return model
 
