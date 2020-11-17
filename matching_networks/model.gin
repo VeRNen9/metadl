@@ -4,4 +4,4 @@ MyMetaLearner.num_channels = 3
 MyMetaLearner.n_ways = 5
 MyMetaLearner.k_shots = 1
 MyMetaLearner.embedding_dim = 64
-MyMetaLearner.distance_func = "cosine"
+MyMetaLearner.distance_measure = "cosine"
