@@ -6,7 +6,7 @@ import logging
 import tensorflow as tf
 
 from metadl.api.api import MetaLearner, Learner, Predictor
-from .helper import embedding_architecture, cosine_distance, attention_mechanism
+from .helper import attention_mechanism, cosine_distance, embedding_architecture
 
 
 # Line necessary for duranium. Comment it otherwise.
@@ -16,29 +16,30 @@ tf.random.set_seed(1234)
 @gin.configurable
 class MyMetaLearner(MetaLearner):
     
-    distance_functions = {
+    distance_measures = {
         'cosine': cosine_distance
     }
 
     def __init__(self, img_size, num_channels, n_way=5, k_shot=1,
-                 embedding_dim=64, distance_func='cosine'):
+                 embedding_dim=64, distance_measure='cosine'):
         super().__init__()
         self.img_size = img_size
         self.num_channels = num_channels
         self.n_way = n_way
         self.k_shot = k_shot
         self.embedding_dim = embedding_dim
-        self.distance_func = self._set_distance_func(distance_func)
-        
+        self.distance_measure = distance_measure
+
+        self._dist_func = self._set_distance_function()
         self.model = self._matching_architecture()
 
-    def _set_distance_func(self, distance_func):
-        if distance_func not in MyMetaLearner.distance_functions:
+    def _set_distance_function(self):
+        if self.distance_measure not in MyMetaLearner.distance_measures:
             raise ValueError(
                 'Distance functions not supported.\n' +
                 'Available functions: ' +
-                ', '.join(list(MyMetaLearner.distance_functions.keys())))
-        return MyMetaLearner.distance_functions[distance_func]
+                ', '.join(list(MyMetaLearner.distance_measures.keys())))
+        return MyMetaLearner.distance_measures[self.distance_measure]
 
     def _matching_architecture(self):
         support_set = tf.keras.Input(
@@ -52,7 +53,7 @@ class MyMetaLearner(MetaLearner):
                                    embedding_dim=self.embedding_dim)
         
         attention = attention_mechanism(
-            f, g, distance_func=self.distance_func)
+            f, g, distance_function=self._dist_func)
         
         model = tf.keras.Model(inputs=[support_set, query_set],
                                outputs=attention)

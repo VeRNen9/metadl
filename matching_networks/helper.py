@@ -36,7 +36,7 @@ def cosine_distance(x, y):
         tf.expand_dims(x, 1), y))
 
 
-def attention_mechanism(f, g, distance_func=cosine_distance):
+def attention_mechanism(f, g, distance_function=cosine_distance):
     """
     Implements the attention mechanism. Computes the cosine distance
     between each image embedding in the query set and the embeddings
@@ -60,4 +60,4 @@ def attention_mechanism(f, g, distance_func=cosine_distance):
     tf.Tensor
     A probability distributions for each image in the query set.
     """
-    return tf.nn.softmax(distance_func(f, g), name='attention_mechanism')
+    return tf.nn.softmax(distance_function(f, g), name='attention_mechanism')
